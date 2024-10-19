@@ -1,0 +1,12 @@
+package com.mobdeve.s19.mobdev;
+
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class ReportActivity extends AppCompatActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_report); // Make sure this points to your activity_report.xml
+    }
+}

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -16,7 +18,7 @@
         android:textStyle="bold"
         android:textSize="24sp"
         android:textColor="@android:color/black"
-        android:paddingBottom="10dp"/>
+        android:paddingBottom="10dp" />
 
     <!-- Report Range Options -->
     <LinearLayout
@@ -74,10 +76,7 @@
             android:text="Grand Report" />
     </LinearLayout>
 
-    <!-- Date Picker -->
-
-    <!-- Search Button -->
-
+    <!-- Date Picker and Search Button -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -121,4 +120,171 @@
         android:text="Search"
         android:layout_marginTop="16dp"
         android:layout_gravity="center_horizontal" />
+
+    <!-- Bottom Navigation Bar -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bottom_nav_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="#FFFFFF">
+
+        <!-- LinearLayout to distribute icons evenly -->
+        <LinearLayout
+            android:layout_width="430dp"
+            android:layout_height="44dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="5"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:layout_editor_absoluteX="-25dp">
+
+            <!-- Home Button -->
+            <LinearLayout
+                android:id="@+id/nav_home"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/home_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/home" />
+
+                <TextView
+                    android:id="@+id/home_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Home"
+                    android:textColor="#35BBCA" />
+            </LinearLayout>
+
+            <!-- Add Button -->
+            <LinearLayout
+                android:id="@+id/nav_add"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/add_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/add" />
+
+                <TextView
+                    android:id="@+id/add_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add"
+                    android:textColor="#35BBCA" />
+            </LinearLayout>
+
+            <!-- Products Button -->
+            <LinearLayout
+                android:id="@+id/nav_products"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/products_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/products" />
+
+                <TextView
+                    android:id="@+id/products_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Products"
+                    android:textColor="#35BBCA" />
+            </LinearLayout>
+
+            <!-- Notifications Button -->
+            <LinearLayout
+                android:id="@+id/nav_notifications"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/notifications_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/notifs" />
+
+                <TextView
+                    android:id="@+id/notifications_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Reports"
+                    android:textColor="#35BBCA" />
+            </LinearLayout>
+
+            <!-- Search Button -->
+            <LinearLayout
+                android:id="@+id/nav_search"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/search_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/search" />
+
+                <TextView
+                    android:id="@+id/search_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Search"
+                    android:textColor="#35BBCA" />
+            </LinearLayout>
+
+            <!-- Settings Button -->
+            <LinearLayout
+                android:id="@+id/nav_settings"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/settings_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@android:color/transparent"
+                    android:src="@android:drawable/ic_menu_manage" />
+
+                <TextView
+                    android:id="@+id/settings_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Settings"
+                    android:textColor="#35BBCA" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 </LinearLayout>
