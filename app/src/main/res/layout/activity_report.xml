@@ -1,19 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
+    <!-- Toolbar -->
     <RelativeLayout
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/white"
-        android:padding="16dp"
-        app:layout_constraintTop_toTopOf="parent">
-
+        android:padding="16dp">
         <TextView
             android:id="@+id/app_name"
             android:layout_width="wrap_content"
@@ -22,7 +20,6 @@
             android:text="StockSmart"
             android:textColor="@android:color/black"
             android:textSize="20sp" />
-
         <ImageView
             android:id="@+id/menu_icon"
             android:layout_width="24dp"
@@ -31,306 +28,132 @@
     </RelativeLayout>
 
     <!-- Content above the navbar -->
-    <LinearLayout
+    <ScrollView
+        android:id="@+id/main_content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:id="@+id/report"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/bottom_nav_bar"
-        android:gravity="center">
-
-        <TextView
-            android:id="@+id/tv_report_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Inventory Report"
-            android:textStyle="bold"
-            android:textSize="24sp"
-            android:textColor="@android:color/black"
-            android:paddingBottom="10dp" />
-
-        <!-- Report Range Options -->
-        <LinearLayout
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="16dp">
-
-            <Button
-                android:id="@+id/btnToday"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:backgroundTint="#35BBCA"
-                android:text="Today" />
-
-            <Button
-                android:id="@+id/btnYesterday"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:backgroundTint="#35BBCA"
-                android:text="Yesterday" />
-
-            <Button
-                android:id="@+id/btnLast7Days"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:backgroundTint="#35BBCA"
-                android:text="Last 7 Days" />
-
-            <Button
-                android:id="@+id/btnLast30Days"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:backgroundTint="#35BBCA"
-                android:text="Last 30 Days" />
-
-            <Button
-                android:id="@+id/btnCurrentMonth"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:backgroundTint="#35BBCA"
-                android:text="Current Month" />
-
-            <Button
-                android:id="@+id/btnPreviousMonth"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:backgroundTint="#35BBCA"
-                android:text="Previous Month" />
-
-            <Button
-                android:id="@+id/btnCurrentYear"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:backgroundTint="#35BBCA"
-                android:text="Current Year" />
-
-            <Button
-                android:id="@+id/btnGrandReport"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:backgroundTint="#35BBCA"
-                android:text="Grand Report" />
-        </LinearLayout>
-
-        <!-- Date Picker and Search Button -->
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_navbar">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="From" />
-
-            <EditText
-                android:id="@+id/etFromDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:focusable="false"
-                android:hint="YYYY-MM-DD"
-                android:inputType="none" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="To" />
-
-            <EditText
-                android:id="@+id/etToDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:focusable="false"
-                android:hint="YYYY-MM-DD"
-                android:inputType="none" />
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/btnSearch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Search"
-            app:backgroundTint="#35BBCA"
-            android:layout_marginTop="16dp"
-            android:layout_gravity="center_horizontal" />
-
-    </LinearLayout>
-
-    <!-- Bottom Navigation Bar -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/bottom_nav_bar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="#FFFFFF"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <!-- Home Button -->
-        <LinearLayout
-            android:id="@+id/nav_home"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
             android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/nav_add"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-            <ImageButton
-                android:id="@+id/home_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/home"
-                android:background="@android:color/transparent" />
+            android:padding="16dp"
+            android:gravity="center">
             <TextView
-                android:id="@+id/home_label"
+                android:id="@+id/tv_report_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Home"
-                android:textColor="#35BBCA" />
-        </LinearLayout>
+                android:text="Inventory Report"
+                android:textStyle="bold"
+                android:textSize="24sp"
+                android:layout_marginTop="48dp"
+                android:textColor="@android:color/black"
+                android:paddingBottom="10dp" />
 
-        <!-- Add Button -->
-        <LinearLayout
-            android:id="@+id/nav_add"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/nav_products"
-            app:layout_constraintStart_toEndOf="@id/nav_home"
-            app:layout_constraintTop_toTopOf="parent">
-            <ImageButton
-                android:id="@+id/add_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/add"
-                android:background="@android:color/transparent" />
-            <TextView
-                android:id="@+id/add_label"
-                android:layout_width="wrap_content"
+            <!-- Report Range Options -->
+            <LinearLayout
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
-                android:text="Add"
-                android:textColor="#35BBCA" />
-        </LinearLayout>
+                android:orientation="vertical"
+                android:layout_marginBottom="16dp">
+                <Button
+                    android:id="@+id/btnToday"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:backgroundTint="#35BBCA"
+                    android:text="Today" />
+                <Button
+                    android:id="@+id/btnYesterday"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:backgroundTint="#35BBCA"
+                    android:text="Yesterday" />
+                <Button
+                    android:id="@+id/btnLast7Days"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:backgroundTint="#35BBCA"
+                    android:text="Last 7 Days" />
+                <Button
+                    android:id="@+id/btnLast30Days"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:backgroundTint="#35BBCA"
+                    android:text="Last 30 Days" />
+                <Button
+                    android:id="@+id/btnCurrentMonth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:backgroundTint="#35BBCA"
+                    android:text="Current Month" />
+                <Button
+                    android:id="@+id/btnPreviousMonth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:backgroundTint="#35BBCA"
+                    android:text="Previous Month" />
+                <Button
+                    android:id="@+id/btnCurrentYear"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:backgroundTint="#35BBCA"
+                    android:text="Current Year" />
+                <Button
+                    android:id="@+id/btnGrandReport"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:backgroundTint="#35BBCA"
+                    android:text="Grand Report" />
+            </LinearLayout>
 
-        <!-- Products Button -->
-        <LinearLayout
-            android:id="@+id/nav_products"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/nav_notifications"
-            app:layout_constraintStart_toEndOf="@id/nav_add"
-            app:layout_constraintTop_toTopOf="parent">
-            <ImageButton
-                android:id="@+id/products_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/products"
-                android:background="@android:color/transparent" />
-            <TextView
-                android:id="@+id/products_label"
-                android:layout_width="wrap_content"
+            <!-- Date Picker and Search Button -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Products"
-                android:textColor="#35BBCA" />
-        </LinearLayout>
-
-        <!-- Notifications Button -->
-        <LinearLayout
-            android:id="@+id/nav_notifications"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/nav_search"
-            app:layout_constraintStart_toEndOf="@id/nav_products"
-            app:layout_constraintTop_toTopOf="parent">
-            <ImageButton
-                android:id="@+id/notifications_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/notifs"
-                android:background="@android:color/transparent" />
-            <TextView
-                android:id="@+id/notifications_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Reports"
-                android:textColor="#35BBCA" />
-        </LinearLayout>
-
-        <!-- Search Button -->
-        <LinearLayout
-            android:id="@+id/nav_search"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/nav_settings"
-            app:layout_constraintStart_toEndOf="@id/nav_notifications"
-            app:layout_constraintTop_toTopOf="parent">
-            <ImageButton
-                android:id="@+id/search_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/search"
-                android:background="@android:color/transparent" />
-            <TextView
-                android:id="@+id/search_label"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="From" />
+                <EditText
+                    android:id="@+id/etFromDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:focusable="false"
+                    android:hint="YYYY-MM-DD"
+                    android:inputType="none" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="To" />
+                <EditText
+                    android:id="@+id/etToDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:hint="YYYY-MM-DD"
+                    android:inputType="none" />
+            </LinearLayout>
+            <Button
+                android:id="@+id/btnSearch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Search"
-                android:textColor="#35BBCA" />
+                app:backgroundTint="#35BBCA"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center_horizontal" />
         </LinearLayout>
+    </ScrollView>
 
-        <!-- Settings Button -->
-        <LinearLayout
-            android:id="@+id/nav_settings"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/nav_search"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageButton
-                android:id="@+id/settings_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:background="@android:color/transparent"
-                android:src="@android:drawable/ic_menu_manage" />
-            <TextView
-                android:id="@+id/settings_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Settings"
-                android:textColor="#35BBCA" />
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Include Bottom Navbar -->
+    <include
+        android:id="@+id/bottom_navbar"
+        layout="@layout/activity_botnavbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
+</RelativeLayout>

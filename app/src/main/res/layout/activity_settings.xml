@@ -1,117 +1,134 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <!-- Main Content -->
+    <ScrollView
+        android:id="@+id/main_content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_navbar">
 
-        <!-- Toolbar -->
-        <RelativeLayout
-            android:id="@+id/toolbar"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/white"
-            android:padding="16dp"
-            app:layout_constraintTop_toTopOf="parent">
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Toolbar -->
+
+            <RelativeLayout
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:padding="0dp">
+
+                <ImageView
+                    android:id="@+id/menu_icon2"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/burger" />
+
+                <TextView
+                    android:id="@+id/app_name2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:text="StockSmart"
+                    android:textColor="@android:color/black"
+                    android:textSize="20sp" />
+
+            </RelativeLayout>
+
             <TextView
-                android:id="@+id/app_name"
+                android:id="@+id/dashboard_title2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:drawableStart="@drawable/setting"
+                android:drawablePadding="12dp"
+                android:text="Settings"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.054"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+            <!-- Settings Page -->
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:text="StockSmart"
-                android:textColor="@android:color/black"
-                android:textSize="20sp" />
-            <ImageView
-                android:id="@+id/menu_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/burger" />
-        </RelativeLayout>
-        <TextView
-            android:id="@+id/settings_title"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.054"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toolbar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
-            android:drawableStart="@drawable/setting"
-            android:drawablePadding="8dp"
-            android:text="Settings"
-            android:textColor="#35BBCA"
-            android:textSize="18sp" />
+                android:text="Change Password"
+                android:textSize="18sp" />
+            <Button
+                android:id="@+id/change_password_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:backgroundTint="#35BBCA"
+                android:text="Change Password" />
 
-        <!-- Settings Page -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Change Password"
-            android:textSize="18sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Change Business Name"
+                android:textSize="18sp"
+                android:layout_marginTop="16dp" />
+            <Button
+                android:id="@+id/change_business_name_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:backgroundTint="#35BBCA"
+                android:text="Change Business Name" />
 
-        <Button
-            android:id="@+id/change_password_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"
-            android:backgroundTint="#35BBCA"
-            android:text="Change Password" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Notification Preferences"
+                android:textSize="18sp"
+                android:layout_marginTop="16dp" />
+            <Button
+                android:id="@+id/fix_notification_preferences_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:backgroundTint="#35BBCA"
+                android:text="Notification Preferences" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Change Business Name"
-            android:textSize="18sp"
-            android:layout_marginTop="16dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Online/Offline Mode"
+                android:textSize="18sp"
+                android:layout_marginTop="16dp" />
+            <Switch
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/toggle_mode_switch" />
 
-        <Button
-            android:id="@+id/change_business_name_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"
-            android:backgroundTint="#35BBCA"
-            android:text="Change Business Name" />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Log Out"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="#35BBCA"
+                android:id="@+id/logout_button" />
+        </LinearLayout>
+    </ScrollView>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Notification Preferences"
-            android:textSize="18sp"
-            android:layout_marginTop="16dp" />
-
-        <Button
-            android:id="@+id/fix_notification_preferences_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"
-            android:backgroundTint="#35BBCA"
-            android:text="Notification Preferences" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Online/Offline Mode"
-            android:textSize="18sp"
-            android:layout_marginTop="16dp" />
-        <Switch
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/toggle_mode_switch" />
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Log Out"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="#35BBCA"
-            android:id="@+id/logout_button" />
-
-    </LinearLayout>
-</ScrollView>
+    <!-- Include Bottom Navbar -->
+    <include
+        android:id="@+id/bottom_navbar"
+        layout="@layout/activity_botnavbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
+</RelativeLayout>
