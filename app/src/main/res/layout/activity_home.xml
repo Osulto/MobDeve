@@ -32,10 +32,6 @@
             android:src="@drawable/burger" />
     </RelativeLayout>
 
-    <!-- Dashboard Title -->
-
-    <!-- Search Bar -->
-
     <TextView
         android:id="@+id/dashboard_title"
         android:layout_width="wrap_content"
@@ -50,14 +46,6 @@
         app:layout_constraintHorizontal_bias="0.054"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
-
-    <!-- Total Items and Total Profit -->
-
-    <!-- Stock per Category Pie Chart -->
-
-    <!-- Side Buttons -->
-
-    <!-- Bottom Navigation Bar -->
 
     <EditText
         android:id="@+id/search_bar"
@@ -197,175 +185,6 @@
         android:text="QR CODE"
         app:layout_constraintStart_toEndOf="@+id/stock_per_category"
         app:layout_constraintTop_toBottomOf="@+id/total_items_profit" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/bottom_nav_bar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="#FFFFFF"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <!-- Home Button -->
-        <LinearLayout
-            android:id="@+id/nav_home"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/nav_add"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-            <ImageButton
-                android:id="@+id/home_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/home"
-                android:background="@android:color/transparent" />
-            <TextView
-                android:id="@+id/home_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Home"
-                android:textColor="#35BBCA" />
-        </LinearLayout>
-
-        <!-- Add Button -->
-        <LinearLayout
-            android:id="@+id/nav_add"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/nav_products"
-            app:layout_constraintStart_toEndOf="@id/nav_home"
-            app:layout_constraintTop_toTopOf="parent">
-            <ImageButton
-                android:id="@+id/add_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/add"
-                android:background="@android:color/transparent" />
-            <TextView
-                android:id="@+id/add_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Add"
-                android:textColor="#35BBCA" />
-        </LinearLayout>
-
-        <!-- Products Button -->
-        <LinearLayout
-            android:id="@+id/nav_products"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/nav_notifications"
-            app:layout_constraintStart_toEndOf="@id/nav_add"
-            app:layout_constraintTop_toTopOf="parent">
-            <ImageButton
-                android:id="@+id/products_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/products"
-                android:background="@android:color/transparent" />
-            <TextView
-                android:id="@+id/products_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Products"
-                android:textColor="#35BBCA" />
-        </LinearLayout>
-
-        <!-- Notifications Button -->
-        <LinearLayout
-            android:id="@+id/nav_notifications"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/nav_search"
-            app:layout_constraintStart_toEndOf="@id/nav_products"
-            app:layout_constraintTop_toTopOf="parent">
-            <ImageButton
-                android:id="@+id/notifications_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/notifs"
-                android:background="@android:color/transparent" />
-            <TextView
-                android:id="@+id/notifications_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Reports"
-                android:textColor="#35BBCA" />
-        </LinearLayout>
-
-        <!-- Search Button -->
-        <LinearLayout
-            android:id="@+id/nav_search"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/nav_settings"
-            app:layout_constraintStart_toEndOf="@id/nav_notifications"
-            app:layout_constraintTop_toTopOf="parent">
-            <ImageButton
-                android:id="@+id/search_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/search"
-                android:background="@android:color/transparent" />
-            <TextView
-                android:id="@+id/search_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Search"
-                android:textColor="#35BBCA" />
-        </LinearLayout>
-
-        <!-- Settings Button -->
-        <LinearLayout
-            android:id="@+id/nav_settings"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/nav_search"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageButton
-                android:id="@+id/settings_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:background="@android:color/transparent"
-                android:src="@android:drawable/ic_menu_manage" />
-            <TextView
-                android:id="@+id/settings_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Settings"
-                android:textColor="#35BBCA" />
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button
         android:id="@+id/side_button_2"
