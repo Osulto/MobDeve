@@ -210,4 +210,11 @@
         app:layout_constraintTop_toBottomOf="@+id/stock_per_category"
         app:srcCompat="@drawable/piedata" />
 
+    <include
+        android:id="@+id/bottomNavBar"
+        layout="@layout/activity_botnavbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
