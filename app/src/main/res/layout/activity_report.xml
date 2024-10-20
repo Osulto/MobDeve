@@ -62,48 +62,56 @@
                 android:id="@+id/btnToday"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:backgroundTint="#35BBCA"
                 android:text="Today" />
 
             <Button
                 android:id="@+id/btnYesterday"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:backgroundTint="#35BBCA"
                 android:text="Yesterday" />
 
             <Button
                 android:id="@+id/btnLast7Days"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:backgroundTint="#35BBCA"
                 android:text="Last 7 Days" />
 
             <Button
                 android:id="@+id/btnLast30Days"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:backgroundTint="#35BBCA"
                 android:text="Last 30 Days" />
 
             <Button
                 android:id="@+id/btnCurrentMonth"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:backgroundTint="#35BBCA"
                 android:text="Current Month" />
 
             <Button
                 android:id="@+id/btnPreviousMonth"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:backgroundTint="#35BBCA"
                 android:text="Previous Month" />
 
             <Button
                 android:id="@+id/btnCurrentYear"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:backgroundTint="#35BBCA"
                 android:text="Current Year" />
 
             <Button
                 android:id="@+id/btnGrandReport"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:backgroundTint="#35BBCA"
                 android:text="Grand Report" />
         </LinearLayout>
 
@@ -149,6 +157,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Search"
+            app:backgroundTint="#35BBCA"
             android:layout_marginTop="16dp"
             android:layout_gravity="center_horizontal" />
 
