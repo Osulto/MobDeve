@@ -10,16 +10,25 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
 
     private Context context;
     private List<Product> productList;
+    private List<Product> filteredList;
+    private OnItemClickListener listener;
 
-    public ProductAdapter(Context context, List<Product> productList) {
+    public interface OnItemClickListener {
+        void onItemClick(Product product);
+    }
+
+    public ProductAdapter(Context context, List<Product> productList, OnItemClickListener listener) {
         this.context = context;
         this.productList = productList;
+        this.filteredList = new ArrayList<>(productList);
+        this.listener = listener;
     }
 
     @NonNull
@@ -31,32 +40,48 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
-        Product product = productList.get(position);
-        holder.productName.setText(product.getName());
-        holder.productStockCount.setText("Stock: " + product.getStockCount());
-        holder.productDate.setText(product.getDate());
-
-        // If using an image loading library like Glide or Picasso, uncomment the below line
-        // Glide.with(context).load(product.getImageUrl()).into(holder.productImage);
-        holder.productImage.setImageResource(R.drawable.ic_launcher_background); // Placeholder for now
+        Product product = filteredList.get(position);
+        holder.bind(product, listener);
     }
 
     @Override
     public int getItemCount() {
-        return productList.size();
+        return filteredList.size();
+    }
+
+    public void setFilteredList(List<Product> filteredList) {
+        this.filteredList = filteredList;
+        notifyDataSetChanged();
     }
 
     public static class ProductViewHolder extends RecyclerView.ViewHolder {
 
         ImageView productImage;
-        TextView productName, productStockCount, productDate;
+        TextView productName, productCategory, productStockCount, productDate;
 
         public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
             productImage = itemView.findViewById(R.id.product_image);
             productName = itemView.findViewById(R.id.product_name);
+            productCategory = itemView.findViewById(R.id.product_category);
             productStockCount = itemView.findViewById(R.id.product_stock_count);
             productDate = itemView.findViewById(R.id.product_date);
+        }
+
+        public void bind(final Product product, final OnItemClickListener listener) {
+            productName.setText(product.getName());
+            productCategory.setText(product.getCategory());
+            productStockCount.setText("Stock: " + product.getStockCount());
+            productDate.setText(product.getDate());
+
+            productImage.setImageResource(R.drawable.ic_launcher_background);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onItemClick(product);
+                }
+            });
         }
     }
 }
