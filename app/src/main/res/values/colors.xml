@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="primary">#0191B4</color>
+    <color name="primary_dark">#016D88</color>
+    <color name="accent">#35BBCA</color>
+    <color name="background">#FCFEFF</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="bottom_nav_selected">@color/primary</color>
+    <color name="bottom_nav_unselected">#757575</color>
+    <color name="success">#4CAF50</color>
+    <color name="warning">#FFA000</color>
+    <color name="error">#F44336</color>
+    <color name="category_bg_tops">#E3F2FD</color>
+    <color name="category_bg_bottoms">#F3E5F5</color>
+    <color name="category_bg_dresses">#FFEBEE</color>
+    <color name="category_bg_outerwear">#E8F5E9</color>
+    <color name="category_bg_accessories">#FFF3E0</color>
+    <color name="category_bg_footwear">#E0F7FA</color>
 </resources>
