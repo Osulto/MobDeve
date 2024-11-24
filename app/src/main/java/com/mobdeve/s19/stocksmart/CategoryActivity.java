@@ -33,6 +33,8 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 
 public class CategoryActivity extends AppCompatActivity implements CategoryAdapter.OnCategoryClickListener {
 
@@ -345,6 +347,7 @@ public class CategoryActivity extends AppCompatActivity implements CategoryAdapt
         }
     }
 
+
     private void loadCategories() {
         try {
             List<Category> categories = categoryDao.getAll();
@@ -403,7 +406,19 @@ public class CategoryActivity extends AppCompatActivity implements CategoryAdapt
 
     private String savePlaceholderImage() {
         try {
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.placeholder_image);
+            Drawable drawable = ContextCompat.getDrawable(this, R.drawable.placeholder_image);
+            if (drawable == null) return null;
+
+            Bitmap bitmap = Bitmap.createBitmap(
+                    drawable.getIntrinsicWidth(),
+                    drawable.getIntrinsicHeight(),
+                    Bitmap.Config.ARGB_8888
+            );
+
+            Canvas canvas = new Canvas(bitmap);
+            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            drawable.draw(canvas);
+
             String filename = "category_icon_" + UUID.randomUUID().toString() + ".jpg";
             File file = new File(getFilesDir(), filename);
 

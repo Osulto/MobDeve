@@ -6,21 +6,33 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import com.mobdeve.s19.stocksmart.database.DatabaseHelper;
 import com.mobdeve.s19.stocksmart.database.models.Product;
+import com.mobdeve.s19.stocksmart.utils.SessionManager;
 import java.util.ArrayList;
 import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class ProductDao implements BaseDao<Product> {
     private DatabaseHelper dbHelper;
     private SQLiteDatabase db;
+    private Context context;
 
     public ProductDao(Context context) {
+        this.context = context;
         dbHelper = new DatabaseHelper(context);
+    }
+
+    private String getCurrentTimestamp() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        return sdf.format(new Date());
     }
 
     @Override
     public long insert(Product product) {
         db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.COLUMN_BUSINESS_ID, SessionManager.getInstance(context).getUserId());
         values.put(DatabaseHelper.COLUMN_PRODUCT_NAME, product.getName());
         values.put(DatabaseHelper.COLUMN_CATEGORY_ID, product.getCategoryId());
         values.put(DatabaseHelper.COLUMN_QUANTITY, product.getQuantity());
@@ -47,11 +59,13 @@ public class ProductDao implements BaseDao<Product> {
         values.put(DatabaseHelper.COLUMN_SELLING_PRICE, product.getSellingPrice());
         values.put(DatabaseHelper.COLUMN_QR_CODE, product.getQrCode());
         values.put(DatabaseHelper.COLUMN_DESCRIPTION, product.getDescription());
-        values.put(DatabaseHelper.COLUMN_UPDATED_AT, java.time.LocalDateTime.now().toString());
+        values.put(DatabaseHelper.COLUMN_UPDATED_AT, getCurrentTimestamp());
 
         int rowsAffected = db.update(DatabaseHelper.TABLE_PRODUCTS, values,
-                DatabaseHelper.COLUMN_ID + " = ?",
-                new String[]{String.valueOf(product.getId())});
+                DatabaseHelper.COLUMN_ID + " = ? AND " +
+                        DatabaseHelper.COLUMN_BUSINESS_ID + " = ?",
+                new String[]{String.valueOf(product.getId()),
+                        String.valueOf(SessionManager.getInstance(context).getUserId())});
         db.close();
         return rowsAffected > 0;
     }
@@ -60,8 +74,10 @@ public class ProductDao implements BaseDao<Product> {
     public boolean delete(long id) {
         db = dbHelper.getWritableDatabase();
         int rowsAffected = db.delete(DatabaseHelper.TABLE_PRODUCTS,
-                DatabaseHelper.COLUMN_ID + " = ?",
-                new String[]{String.valueOf(id)});
+                DatabaseHelper.COLUMN_ID + " = ? AND " +
+                        DatabaseHelper.COLUMN_BUSINESS_ID + " = ?",
+                new String[]{String.valueOf(id),
+                        String.valueOf(SessionManager.getInstance(context).getUserId())});
         db.close();
         return rowsAffected > 0;
     }
@@ -72,8 +88,10 @@ public class ProductDao implements BaseDao<Product> {
         Product product = null;
 
         Cursor cursor = db.query(DatabaseHelper.TABLE_PRODUCTS, null,
-                DatabaseHelper.COLUMN_ID + " = ?",
-                new String[]{String.valueOf(id)},
+                DatabaseHelper.COLUMN_ID + " = ? AND " +
+                        DatabaseHelper.COLUMN_BUSINESS_ID + " = ?",
+                new String[]{String.valueOf(id),
+                        String.valueOf(SessionManager.getInstance(context).getUserId())},
                 null, null, null);
 
         if (cursor != null && cursor.moveToFirst()) {
@@ -90,7 +108,9 @@ public class ProductDao implements BaseDao<Product> {
         db = dbHelper.getReadableDatabase();
 
         Cursor cursor = db.query(DatabaseHelper.TABLE_PRODUCTS,
-                null, null, null,
+                null,
+                DatabaseHelper.COLUMN_BUSINESS_ID + " = ?",
+                new String[]{String.valueOf(SessionManager.getInstance(context).getUserId())},
                 null, null, null);
 
         if (cursor != null) {
@@ -108,8 +128,10 @@ public class ProductDao implements BaseDao<Product> {
         db = dbHelper.getReadableDatabase();
 
         Cursor cursor = db.query(DatabaseHelper.TABLE_PRODUCTS, null,
-                DatabaseHelper.COLUMN_CATEGORY_ID + " = ?",
-                new String[]{String.valueOf(categoryId)},
+                DatabaseHelper.COLUMN_CATEGORY_ID + " = ? AND " +
+                        DatabaseHelper.COLUMN_BUSINESS_ID + " = ?",
+                new String[]{String.valueOf(categoryId),
+                        String.valueOf(SessionManager.getInstance(context).getUserId())},
                 null, null, null);
 
         if (cursor != null) {
@@ -128,9 +150,11 @@ public class ProductDao implements BaseDao<Product> {
 
         String query = "SELECT * FROM " + DatabaseHelper.TABLE_PRODUCTS +
                 " WHERE " + DatabaseHelper.COLUMN_QUANTITY + " <= " +
-                DatabaseHelper.COLUMN_REORDER_POINT;
+                DatabaseHelper.COLUMN_REORDER_POINT +
+                " AND " + DatabaseHelper.COLUMN_BUSINESS_ID + " = ?";
 
-        Cursor cursor = db.rawQuery(query, null);
+        Cursor cursor = db.rawQuery(query,
+                new String[]{String.valueOf(SessionManager.getInstance(context).getUserId())});
 
         if (cursor != null) {
             while (cursor.moveToNext()) {
@@ -147,8 +171,10 @@ public class ProductDao implements BaseDao<Product> {
         Product product = null;
 
         Cursor cursor = db.query(DatabaseHelper.TABLE_PRODUCTS, null,
-                DatabaseHelper.COLUMN_QR_CODE + " = ?",
-                new String[]{qrCode},
+                DatabaseHelper.COLUMN_QR_CODE + " = ? AND " +
+                        DatabaseHelper.COLUMN_BUSINESS_ID + " = ?",
+                new String[]{qrCode,
+                        String.valueOf(SessionManager.getInstance(context).getUserId())},
                 null, null, null);
 
         if (cursor != null && cursor.moveToFirst()) {

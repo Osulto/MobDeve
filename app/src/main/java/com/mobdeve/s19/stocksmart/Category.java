@@ -3,7 +3,7 @@ package com.mobdeve.s19.stocksmart;
 public class Category {
     private long id;
     private String name;
-    private int iconResource;
+    private String iconPath;
     private String createdAt;
     private String updatedAt;
 
@@ -11,16 +11,16 @@ public class Category {
     public Category() {}
 
     // Constructor without ID (for creation)
-    public Category(String name, int iconResource) {
+    public Category(String name, String iconPath) {
         this.name = name;
-        this.iconResource = iconResource;
+        this.iconPath = iconPath;
     }
 
     // Full constructor
-    public Category(long id, String name, int iconResource, String createdAt, String updatedAt) {
+    public Category(long id, String name, String iconPath, String createdAt, String updatedAt) {
         this.id = id;
         this.name = name;
-        this.iconResource = iconResource;
+        this.iconPath = iconPath;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -42,12 +42,12 @@ public class Category {
         this.name = name;
     }
 
-    public int getIconResource() {
-        return iconResource;
+    public String getIconPath() {
+        return iconPath;
     }
 
-    public void setIconResource(int iconResource) {
-        this.iconResource = iconResource;
+    public void setIconPath(int iconResource) {
+        this.iconPath = iconPath;
     }
 
     public String getCreatedAt() {

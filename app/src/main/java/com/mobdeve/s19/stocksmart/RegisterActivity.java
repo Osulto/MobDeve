@@ -8,6 +8,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.mobdeve.s19.stocksmart.database.dao.UserDao;
 import com.mobdeve.s19.stocksmart.database.models.User;
+import com.mobdeve.s19.stocksmart.utils.SessionManager;
 import android.widget.Toast;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -15,14 +16,16 @@ public class RegisterActivity extends AppCompatActivity {
     private MaterialButton btnRegister;
     private TextView tvLogin;
     private UserDao userDao;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        // Initialize DAO
+        // Initialize DAO and SessionManager
         userDao = ((StockSmartApp) getApplication()).getUserDao();
+        sessionManager = SessionManager.getInstance(this);
 
         initializeViews();
         setupClickListeners();
@@ -39,7 +42,10 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void setupClickListeners() {
         btnRegister.setOnClickListener(v -> attemptRegister());
-        tvLogin.setOnClickListener(v -> finish());
+        tvLogin.setOnClickListener(v -> {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+        });
     }
 
     private void attemptRegister() {
@@ -65,13 +71,30 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
+        // Check if business exists and get its first user
+        User existingBusinessUser = userDao.getFirstUserByBusinessName(businessName);
+
         // Create new user
         User newUser = new User(businessName, username, password);
         long userId = userDao.insert(newUser);
 
         if (userId != -1) {
-            Toast.makeText(this, "Registration successful", Toast.LENGTH_SHORT).show();
-            finish(); // Go back to login
+            newUser.setId(userId);
+
+            // Set session
+            sessionManager.createLoginSession(newUser);
+
+            // If business already exists, link to its data
+            if (existingBusinessUser != null) {
+                sessionManager.setBusinessId(existingBusinessUser.getId());  // Use first user's ID as business ID
+                Toast.makeText(this, "Joined existing business: " + businessName, Toast.LENGTH_SHORT).show();
+            }
+
+            // Go to Home
+            Intent intent = new Intent(this, HomeActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
         } else {
             Toast.makeText(this, "Registration failed", Toast.LENGTH_SHORT).show();
         }

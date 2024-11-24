@@ -110,6 +110,43 @@ public class UserDao implements BaseDao<User> {
         return user;
     }
 
+    public User getFirstUserByBusinessName(String businessName) {
+        db = dbHelper.getReadableDatabase();
+        User user = null;
+
+        Cursor cursor = db.query(DatabaseHelper.TABLE_USERS, null,
+                DatabaseHelper.COLUMN_BUSINESS_NAME + " = ?",
+                new String[]{businessName},
+                null, null,
+                DatabaseHelper.COLUMN_CREATED_AT + " ASC LIMIT 1");  // Get the first user of this business
+
+        if (cursor != null && cursor.moveToFirst()) {
+            user = cursorToUser(cursor);
+            cursor.close();
+        }
+        db.close();
+        return user;
+    }
+
+    public List<User> findByBusinessName(String businessName) {
+        db = dbHelper.getReadableDatabase();
+        List<User> users = new ArrayList<>();
+
+        Cursor cursor = db.query(DatabaseHelper.TABLE_USERS, null,
+                DatabaseHelper.COLUMN_BUSINESS_NAME + " = ?",
+                new String[]{businessName},
+                null, null, null);
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                users.add(cursorToUser(cursor));
+            }
+            cursor.close();
+        }
+        db.close();
+        return users;
+    }
+
     private User cursorToUser(Cursor cursor) {
         return new User(
                 cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID)),

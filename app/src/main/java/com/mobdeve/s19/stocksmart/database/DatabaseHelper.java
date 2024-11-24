@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "stocksmart.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;  // Increment version for new schema
 
     // Table Names
     public static final String TABLE_USERS = "users";
@@ -19,6 +19,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_CREATED_AT = "created_at";
     public static final String COLUMN_UPDATED_AT = "updated_at";
+    public static final String COLUMN_BUSINESS_ID = "business_id";  // New column
 
     // Users Table columns
     public static final String COLUMN_BUSINESS_NAME = "business_name";
@@ -65,15 +66,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_CATEGORIES =
             "CREATE TABLE " + TABLE_CATEGORIES + "(" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    COLUMN_CATEGORY_NAME + " TEXT NOT NULL UNIQUE, " +
+                    COLUMN_BUSINESS_ID + " INTEGER NOT NULL, " +
+                    COLUMN_CATEGORY_NAME + " TEXT NOT NULL, " +
                     COLUMN_CATEGORY_ICON + " TEXT, " +
                     COLUMN_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP, " +
-                    COLUMN_UPDATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP" +
+                    COLUMN_UPDATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP, " +
+                    "FOREIGN KEY(" + COLUMN_BUSINESS_ID + ") REFERENCES " +
+                    TABLE_USERS + "(" + COLUMN_ID + ")" +
                     ")";
 
     private static final String CREATE_TABLE_PRODUCTS =
             "CREATE TABLE " + TABLE_PRODUCTS + "(" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COLUMN_BUSINESS_ID + " INTEGER NOT NULL, " +
                     COLUMN_PRODUCT_NAME + " TEXT NOT NULL, " +
                     COLUMN_CATEGORY_ID + " INTEGER, " +
                     COLUMN_QUANTITY + " INTEGER DEFAULT 0, " +
@@ -84,6 +89,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_DESCRIPTION + " TEXT, " +
                     COLUMN_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP, " +
                     COLUMN_UPDATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP, " +
+                    "FOREIGN KEY(" + COLUMN_BUSINESS_ID + ") REFERENCES " +
+                    TABLE_USERS + "(" + COLUMN_ID + ")," +
                     "FOREIGN KEY(" + COLUMN_CATEGORY_ID + ") REFERENCES " +
                     TABLE_CATEGORIES + "(" + COLUMN_ID + ")" +
                     ")";
@@ -91,12 +98,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_STOCK_MOVEMENTS =
             "CREATE TABLE " + TABLE_STOCK_MOVEMENTS + "(" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COLUMN_BUSINESS_ID + " INTEGER NOT NULL, " +
                     COLUMN_PRODUCT_ID + " INTEGER NOT NULL, " +
                     COLUMN_MOVEMENT_TYPE + " TEXT NOT NULL, " +
                     COLUMN_MOVEMENT_QUANTITY + " INTEGER NOT NULL, " +
                     COLUMN_SUPPLIER + " TEXT, " +
                     COLUMN_NOTES + " TEXT, " +
                     COLUMN_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP, " +
+                    "FOREIGN KEY(" + COLUMN_BUSINESS_ID + ") REFERENCES " +
+                    TABLE_USERS + "(" + COLUMN_ID + ")," +
                     "FOREIGN KEY(" + COLUMN_PRODUCT_ID + ") REFERENCES " +
                     TABLE_PRODUCTS + "(" + COLUMN_ID + ")" +
                     ")";
@@ -104,10 +114,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_IMAGES =
             "CREATE TABLE " + TABLE_IMAGES + "(" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COLUMN_BUSINESS_ID + " INTEGER NOT NULL, " +
                     COLUMN_REFERENCE_ID + " INTEGER NOT NULL, " +
                     COLUMN_REFERENCE_TYPE + " TEXT NOT NULL, " +
                     COLUMN_IMAGE_PATH + " TEXT NOT NULL, " +
-                    COLUMN_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP" +
+                    COLUMN_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP, " +
+                    "FOREIGN KEY(" + COLUMN_BUSINESS_ID + ") REFERENCES " +
+                    TABLE_USERS + "(" + COLUMN_ID + ")" +
                     ")";
 
     public DatabaseHelper(Context context) {
@@ -136,4 +149,3 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 }
-

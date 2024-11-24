@@ -18,6 +18,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import com.mobdeve.s19.stocksmart.utils.SessionManager;
 
 public class HomeActivity extends AppCompatActivity {
     private RecyclerView rvLowStockItems;
@@ -30,9 +31,21 @@ public class HomeActivity extends AppCompatActivity {
     private ProductDao productDao;
     private StockMovementDao stockMovementDao;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Check if user is logged in
+        SessionManager sessionManager = SessionManager.getInstance(this);
+        if (!sessionManager.isLoggedIn()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_home);
 
         // Initialize DAOs

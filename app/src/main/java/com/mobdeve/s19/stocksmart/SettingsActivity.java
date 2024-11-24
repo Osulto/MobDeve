@@ -8,6 +8,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.mobdeve.s19.stocksmart.utils.SessionManager;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -122,9 +123,14 @@ public class SettingsActivity extends AppCompatActivity {
                 .setTitle("Sign Out")
                 .setMessage("Are you sure you want to sign out?")
                 .setPositiveButton("Sign Out", (dialog, which) -> {
-                    // TODO: Implement sign out logic
-                    startActivity(new Intent(this, LoginActivity.class));
-                    finishAffinity();
+                    // Clear session
+                    SessionManager.getInstance(this).logout();
+
+                    // Clear activity stack and go to login
+                    Intent intent = new Intent(this, SplashActivity.class); // Change to SplashActivity
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
                 })
                 .setNegativeButton("Cancel", null)
                 .show();

@@ -8,6 +8,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.mobdeve.s19.stocksmart.database.dao.UserDao;
 import com.mobdeve.s19.stocksmart.database.models.User;
+import com.mobdeve.s19.stocksmart.utils.SessionManager;
 import android.widget.Toast;
 
 public class LoginActivity extends AppCompatActivity {
@@ -15,17 +16,53 @@ public class LoginActivity extends AppCompatActivity {
     private MaterialButton btnLogin;
     private TextView tvRegister;
     private UserDao userDao;
+    private SessionManager sessionManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
 
-        // Initialize DAO
+        // Check if user is already logged in
+        sessionManager = SessionManager.getInstance(this);
+        if (sessionManager.isLoggedIn()) {
+            startActivity(new Intent(this, HomeActivity.class));
+            finish();
+            return;
+        }
+
+        setContentView(R.layout.activity_login);
         userDao = ((StockSmartApp) getApplication()).getUserDao();
 
         initializeViews();
         setupClickListeners();
+    }
+
+    private void attemptLogin() {
+        String username = etUsername.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
+
+        if (username.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        User user = userDao.findByUsername(username);
+        if (user != null && user.getPassword().equals(password)) {
+            // Create session
+            sessionManager.createLoginSession(user);
+
+            // Initialize sample data for new business
+            ((StockSmartApp) getApplication()).initializeSampleData();
+
+            // Use flags to clear activity stack
+            Intent intent = new Intent(this, HomeActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        } else {
+            Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void initializeViews() {
@@ -40,26 +77,5 @@ public class LoginActivity extends AppCompatActivity {
         tvRegister.setOnClickListener(v -> {
             startActivity(new Intent(this, RegisterActivity.class));
         });
-    }
-
-    private void attemptLogin() {
-        String username = etUsername.getText().toString().trim();
-        String password = etPassword.getText().toString().trim();
-
-        // Basic validation
-        if (username.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Check credentials against database
-        User user = userDao.findByUsername(username);
-        if (user != null && user.getPassword().equals(password)) {
-            // Successful login
-            startActivity(new Intent(this, HomeActivity.class));
-            finish();
-        } else {
-            Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show();
-        }
     }
 }
