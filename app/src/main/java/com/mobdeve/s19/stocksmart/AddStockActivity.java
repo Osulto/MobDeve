@@ -13,7 +13,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.textfield.TextInputLayout;
+import com.mobdeve.s19.stocksmart.database.dao.ProductDao;
+import com.mobdeve.s19.stocksmart.database.models.Product;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,12 +28,16 @@ public class AddStockActivity extends AppCompatActivity {
     private Button btnSave, btnCancel;
     private BottomNavigationView bottomNavigation;
 
+    private ProductDao productDao;
+    private List<Product> products;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_stock);
 
         initializeViews();
+        productDao = new ProductDao(this);
         setupProductSpinner();
         setupListeners();
         setupBottomNavigation();
@@ -52,11 +59,20 @@ public class AddStockActivity extends AppCompatActivity {
     }
 
     private void setupProductSpinner() {
-        List<String> products = Arrays.asList("Select Product", "T-Shirt", "Jeans", "Sneakers");
+        products = productDao.getAll(); // Fetch all products from the database
+
+        // Create a list of product names for the spinner
+        List<String> productNames = new ArrayList<>();
+        productNames.add("Select Product"); // Default option
+        for (Product product : products) {
+            productNames.add(product.getName());
+        }
+
+        // Set up the spinner with the product names
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_spinner_item,
-                products
+                productNames
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         productSpinner.setAdapter(adapter);
@@ -140,16 +156,34 @@ public class AddStockActivity extends AppCompatActivity {
     }
 
     private void updateStock() {
-        String productName = productSpinner.getSelectedItem().toString();
+        int selectedIndex = productSpinner.getSelectedItemPosition();
+        if (selectedIndex == 0) {
+            Toast.makeText(this, "Please select a product", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Product selectedProduct = products.get(selectedIndex - 1); // Adjust index for "Select Product"
         int stockChange = Integer.parseInt(etStockChange.getText().toString().trim());
         String supplier = etSupplier.getText().toString().trim();
         String notes = etNotes.getText().toString().trim();
 
-        // TODO: Implement actual stock update logic
-        Toast.makeText(this,
-                "Added " + stockChange + " items to " + productName + " (Supplier: " + supplier + ", Notes: " + notes + ")",
-                Toast.LENGTH_SHORT).show();
-        finish();
+        try {
+            // Update the stock quantity
+            selectedProduct.setQuantity(selectedProduct.getQuantity() + stockChange);
+            boolean success = productDao.update(selectedProduct);
+
+            if (success) {
+                Toast.makeText(this,
+                        "Added " + stockChange + " items to " + selectedProduct.getName() +
+                                " (Supplier: " + supplier + ", Notes: " + notes + ")",
+                        Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(this, "Failed to update stock", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Error updating stock", Toast.LENGTH_SHORT).show();
+        }
     }
 
 }
