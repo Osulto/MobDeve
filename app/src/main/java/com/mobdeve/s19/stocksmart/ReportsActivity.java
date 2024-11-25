@@ -12,8 +12,15 @@ import androidx.cardview.widget.CardView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.mobdeve.s19.stocksmart.database.dao.CategoryDao;
+import com.mobdeve.s19.stocksmart.database.dao.ProductDao;
+import com.mobdeve.s19.stocksmart.database.models.Category;
+import com.mobdeve.s19.stocksmart.database.models.Product;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class ReportsActivity extends AppCompatActivity {
@@ -29,6 +36,8 @@ public class ReportsActivity extends AppCompatActivity {
 
     private Calendar calendar;
     private SimpleDateFormat dateFormat;
+
+    private CategoryDao categoryDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +68,8 @@ public class ReportsActivity extends AppCompatActivity {
         calendar = Calendar.getInstance();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
+        categoryDao = new CategoryDao(this); // Initialize DAO
+
         // Initially hide the report container and export button
         reportContainer.setVisibility(View.GONE);
         btnExport.setEnabled(false);
@@ -81,27 +92,35 @@ public class ReportsActivity extends AppCompatActivity {
         );
         reportTypeSpinner.setAdapter(reportAdapter);
 
-        // Categories
-        String[] categories = {
-                "All Categories",
-                "Tops",
-                "Bottoms",
-                "Dresses",
-                "Outerwear",
-                "Accessories",
-                "Footwear"
-        };
-        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_dropdown_item_1line,
-                categories
-        );
-        categorySpinner.setAdapter(categoryAdapter);
+        // Populate category spinner dynamically
+        populateCategorySpinner();
 
         // Set default selections
         reportTypeSpinner.setText(reportTypes[0], false);
-        categorySpinner.setText(categories[0], false);
     }
+
+    private void populateCategorySpinner() {
+        List<com.mobdeve.s19.stocksmart.database.models.Category> categories = categoryDao.getAll(); // Fetch all categories from the database
+
+        // Convert categories to a list of names for the spinner
+        List<String> categoryNames = new ArrayList<>();
+        categoryNames.add("All Categories"); // Default option
+        for (Category category : categories) {
+            categoryNames.add(category.getName());
+        }
+
+        // Set up the spinner with the category names
+        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                categoryNames
+        );
+        categorySpinner.setAdapter(categoryAdapter);
+
+        // Set default selection
+        categorySpinner.setText(categoryNames.get(0), false);
+    }
+
 
     private void setupDatePickers() {
         etFromDate.setOnClickListener(v -> showDatePicker(etFromDate));
@@ -137,14 +156,18 @@ public class ReportsActivity extends AppCompatActivity {
     private void generateReport() {
         String reportType = reportTypeSpinner.getText().toString();
         String category = categorySpinner.getText().toString();
+        String fromDate = etFromDate.getText().toString();
+        String toDate = etToDate.getText().toString();
+        String minStockStr = etMinStock.getText().toString().trim();
+        String maxStockStr = etMaxStock.getText().toString().trim();
 
-        // Show loading state
+        int minStock = minStockStr.isEmpty() ? Integer.MIN_VALUE : Integer.parseInt(minStockStr);
+        int maxStock = maxStockStr.isEmpty() ? Integer.MAX_VALUE : Integer.parseInt(maxStockStr);
+
         btnGenerate.setEnabled(false);
         btnGenerate.setText("Generating...");
 
-        // TODO: Generate actual report content
-        // For now, show sample data
-        String reportContent = generateSampleReport(reportType, category);
+        String reportContent = generateDynamicReport(reportType, category, fromDate, toDate, minStock, maxStock);
 
         // Update UI
         tvReportTitle.setText(reportType);
@@ -152,10 +175,102 @@ public class ReportsActivity extends AppCompatActivity {
         reportContainer.setVisibility(View.VISIBLE);
         btnExport.setEnabled(true);
 
-        // Reset button
         btnGenerate.setEnabled(true);
         btnGenerate.setText("Generate Report");
     }
+
+    private String generateDynamicReport(String reportType, String category, String fromDate, String toDate, int minStock, int maxStock) {
+        StringBuilder report = new StringBuilder();
+
+        report.append("Report Type: ").append(reportType).append("\n");
+        report.append("Category: ").append(category).append("\n");
+        report.append("Date Range: ").append(fromDate).append(" to ").append(toDate).append("\n\n");
+
+        ProductDao productDao = new ProductDao(this);
+
+        try {
+            List<Product> products;
+            if (category.equals("All Categories")) {
+                products = productDao.getAll(); // Fetch all products
+            } else {
+                CategoryDao categoryDao = new CategoryDao(this);
+                Category selectedCategory = categoryDao.getByName(category);
+                if (selectedCategory == null) {
+                    report.append("No products found for this category.\n");
+                    return report.toString();
+                }
+                products = productDao.getByCategory(selectedCategory.getId());
+            }
+
+            // Filter products based on stock range and date range
+            List<Product> filteredProducts = new ArrayList<>();
+            for (Product product : products) {
+                if (product.getQuantity() >= minStock && product.getQuantity() <= maxStock) {
+                    filteredProducts.add(product);
+                }
+            }
+
+            // Generate report content based on report type
+            switch (reportType) {
+                case "Inventory Summary":
+                    report.append("Total Products: ").append(filteredProducts.size()).append("\n");
+                    int totalStock = 0;
+                    for (Product product : filteredProducts) {
+                        totalStock += product.getQuantity();
+                    }
+                    report.append("Total Stock: ").append(totalStock).append("\n");
+                    break;
+
+                case "Low Stock Report":
+                    report.append("Products Below Threshold:\n");
+                    for (Product product : filteredProducts) {
+                        if (product.getQuantity() <= product.getReorderPoint()) {
+                            report.append("- ").append(product.getName()).append(": ").append(product.getQuantity()).append(" left\n");
+                        }
+                    }
+                    break;
+
+                case "Stock Movement Report":
+                    // For demonstration purposes, show static data for stock movement
+                    report.append("Stock Movement:\n");
+                    report.append("- ").append("Basic White T-Shirt (M)").append(": Added 50 on 2023-11-20\n");
+                    report.append("- ").append("Denim Jeans (S)").append(": Removed 20 on 2023-11-19\n");
+                    break;
+
+                case "Category Analysis":
+                    report.append("Products in ").append(category).append(":\n");
+                    for (Product product : filteredProducts) {
+                        report.append("- ").append(product.getName()).append(": ").append(product.getQuantity()).append(" in stock\n");
+                    }
+                    break;
+
+                case "Value Report":
+                    report.append("Total Value of Products:\n");
+                    double totalValue = 0;
+                    for (Product product : filteredProducts) {
+                        totalValue += product.getQuantity() * product.getSellingPrice();
+                    }
+                    report.append("Total Value: ₱").append(String.format(Locale.getDefault(), "%.2f", totalValue)).append("\n");
+                    break;
+
+                case "Trend Analysis":
+                    report.append("Trends (Static Data):\n");
+                    report.append("- Most Sold: Basic White T-Shirt\n");
+                    report.append("- Least Sold: Summer Dress\n");
+                    break;
+
+                default:
+                    report.append("Invalid report type.\n");
+                    break;
+            }
+        } catch (Exception e) {
+            report.append("Error generating report: ").append(e.getMessage()).append("\n");
+        }
+
+        return report.toString();
+    }
+
+
 
     private String generateSampleReport(String reportType, String category) {
         StringBuilder report = new StringBuilder();
