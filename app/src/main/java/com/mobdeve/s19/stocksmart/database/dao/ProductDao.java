@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
 import com.mobdeve.s19.stocksmart.database.DatabaseHelper;
 import com.mobdeve.s19.stocksmart.database.models.Product;
 import com.mobdeve.s19.stocksmart.utils.SessionManager;
@@ -28,6 +30,8 @@ public class ProductDao implements BaseDao<Product> {
         return sdf.format(new Date());
     }
 
+
+
     @Override
     public long insert(Product product) {
         db = dbHelper.getWritableDatabase();
@@ -39,7 +43,7 @@ public class ProductDao implements BaseDao<Product> {
         values.put(DatabaseHelper.COLUMN_REORDER_POINT, product.getReorderPoint());
         values.put(DatabaseHelper.COLUMN_COST_PRICE, product.getCostPrice());
         values.put(DatabaseHelper.COLUMN_SELLING_PRICE, product.getSellingPrice());
-        values.put(DatabaseHelper.COLUMN_QR_CODE, product.getQrCode());
+        values.put(DatabaseHelper.COLUMN_QR_CODE, product.getQrCode() == null || product.getQrCode().isEmpty() ? null : product.getQrCode());
         values.put(DatabaseHelper.COLUMN_DESCRIPTION, product.getDescription());
 
         long id = db.insert(DatabaseHelper.TABLE_PRODUCTS, null, values);
@@ -200,4 +204,5 @@ public class ProductDao implements BaseDao<Product> {
                 cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_UPDATED_AT))
         );
     }
+
 }
