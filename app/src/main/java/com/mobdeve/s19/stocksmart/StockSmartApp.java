@@ -62,7 +62,7 @@ public class StockSmartApp extends Application {
                         sampleProduct.setCategoryId(categoryId);
                         sampleProduct.setQuantity(10);
                         sampleProduct.setReorderPoint(5);
-                        sampleProduct.setCostPrice(100.0);
+                        sampleProduct.setSupplierPrice(100.0);
                         sampleProduct.setSellingPrice(150.0);
                         sampleProduct.setDescription("This is a sample product");
                         String timestamp = getCurrentTimestamp();

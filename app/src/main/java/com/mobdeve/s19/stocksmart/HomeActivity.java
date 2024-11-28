@@ -10,15 +10,17 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.mobdeve.s19.stocksmart.database.dao.ProductDao;
 import com.mobdeve.s19.stocksmart.database.dao.StockMovementDao;
+import com.mobdeve.s19.stocksmart.database.dao.UpdateDao;
 import com.mobdeve.s19.stocksmart.database.models.Product;
 import com.mobdeve.s19.stocksmart.database.models.StockMovement;
-import java.util.ArrayList;
-import java.util.List;
-import java.text.NumberFormat;
-import java.util.Locale;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.mobdeve.s19.stocksmart.database.models.Update;
 import com.mobdeve.s19.stocksmart.utils.SessionManager;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 public class HomeActivity extends AppCompatActivity {
     private RecyclerView rvLowStockItems;
@@ -30,7 +32,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private ProductDao productDao;
     private StockMovementDao stockMovementDao;
-
+    private UpdateDao updateDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +51,9 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         // Initialize DAOs
-        StockSmartApp app = (StockSmartApp) getApplication();
-        productDao = app.getProductDao();
-        stockMovementDao = app.getStockMovementDao();
+        productDao = new ProductDao(this);
+        stockMovementDao = new StockMovementDao(this);
+        updateDao = new UpdateDao(this);
 
         initializeViews();
         setupClickListeners();
@@ -123,37 +125,73 @@ public class HomeActivity extends AppCompatActivity {
     private void loadRecentUpdates() {
         updatesList.clear();
 
-        // Get recent stock movements
+        // Get recent updates
+        List<Update> updates = updateDao.getRecentUpdates(10);
+        for (Update update : updates) {
+            Product product = productDao.get(update.getProductId());
+            if (product != null) {
+                update.setProductName(product.getName());
+                // For price updates, add the new price to the description
+                if (update.getType() == Update.UpdateType.PRICE_UPDATED) {
+                    update.setDescription(update.getDescription() +
+                            String.format(" New price: %s",
+                                    formatCurrency(product.getSellingPrice())));
+                }
+                updatesList.add(update);
+            }
+        }
+
+        // Get stock movements to show price changes
         List<StockMovement> movements = stockMovementDao.getAll();
         for (StockMovement movement : movements) {
             Product product = productDao.get(movement.getProductId());
             if (product != null) {
-                Update.UpdateType type;
-                if (movement.getMovementType().equals("IN")) {
-                    type = Update.UpdateType.STOCK_ADDED;
-                } else {
-                    type = Update.UpdateType.STOCK_REMOVED;
-                }
-
-                updatesList.add(new Update(
-                        product.getName(),
-                        type,
+                Update update = new Update(
+                        product.getId(),
+                        Update.UpdateType.STOCK_ADDED,
                         movement.getQuantity(),
                         movement.getCreatedAt()
-                ));
+                );
+                update.setProductName(product.getName());
+                update.setDescription(String.format("Added %d units at %s per unit",
+                        movement.getQuantity(),
+                        formatCurrency(movement.getSupplierPrice())));
+                updatesList.add(update);
             }
         }
 
-        // Get low stock alerts
+        // Check for low stock alerts
         List<Product> lowStockProducts = productDao.getLowStockProducts();
         for (Product product : lowStockProducts) {
-            updatesList.add(new Update(
-                    product.getName(),
-                    Update.UpdateType.LOW_STOCK_ALERT,
-                    product.getQuantity(),
-                    new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-                            .format(new Date())
-            ));
+            boolean hasRecentAlert = false;
+            for (Update update : updatesList) {
+                if (update.getProductId() == product.getId() &&
+                        update.getType() == Update.UpdateType.LOW_STOCK_ALERT &&
+                        isUpdateRecent(update.getDate())) {
+                    hasRecentAlert = true;
+                    break;
+                }
+            }
+
+            if (!hasRecentAlert) {
+                Update lowStockUpdate = new Update(
+                        product.getId(),
+                        Update.UpdateType.LOW_STOCK_ALERT,
+                        product.getQuantity(),
+                        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date())
+                );
+                lowStockUpdate.setProductName(product.getName());
+                updateDao.insert(lowStockUpdate);
+                updatesList.add(0, lowStockUpdate);
+            }
+        }
+
+        // Sort updates by date
+        updatesList.sort((u1, u2) -> u2.getDate().compareTo(u1.getDate()));
+
+        // Keep only the most recent 10 updates
+        if (updatesList.size() > 10) {
+            updatesList = updatesList.subList(0, 10);
         }
 
         updateAdapter.notifyDataSetChanged();
@@ -165,18 +203,32 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void calculateFinancialMetrics() {
-        double stockValue = 0.0;
+        double stockValue = stockMovementDao.calculateTotalStockValue();
         double potentialRevenue = 0.0;
 
         List<Product> products = productDao.getAll();
         for (Product product : products) {
-            stockValue += product.getQuantity() * product.getCostPrice();
             potentialRevenue += product.getQuantity() * product.getSellingPrice();
+
+            if (product.getQuantity() <= product.getReorderPoint()) {
+                boolean hasRecentAlert = false;
+                for (Update update : updatesList) {
+                    if (update.getProductId() == product.getId() &&
+                            update.getType() == Update.UpdateType.LOW_STOCK_ALERT &&
+                            isUpdateRecent(update.getDate())) {
+                        hasRecentAlert = true;
+                        break;
+                    }
+                }
+
+                if (!hasRecentAlert) {
+                    addNewUpdate(product.getId(), Update.UpdateType.LOW_STOCK_ALERT, product.getQuantity());
+                }
+            }
         }
 
-        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("en", "PH"));
-        tvStockValue.setText(currencyFormat.format(stockValue));
-        tvPotentialRevenue.setText(currencyFormat.format(potentialRevenue));
+        tvStockValue.setText(formatCurrency(stockValue));
+        tvPotentialRevenue.setText(formatCurrency(potentialRevenue));
     }
 
     private void updateStockCounts() {
@@ -192,14 +244,41 @@ public class HomeActivity extends AppCompatActivity {
         tvLowStockCount.setText(String.valueOf(lowStockProducts.size()));
     }
 
-    public void addNewUpdate(String productName, Update.UpdateType type, int quantity) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
-        String currentTime = sdf.format(new Date());
+    private boolean isUpdateRecent(String updateDate) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            Date date = sdf.parse(updateDate);
+            Date now = new Date();
+            long diffInMillies = Math.abs(now.getTime() - date.getTime());
+            long diffInHours = diffInMillies / (60 * 60 * 1000);
+            return diffInHours < 24;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
-        Update newUpdate = new Update(productName, type, quantity, currentTime);
-        updatesList.add(0, newUpdate);
-        updateAdapter.notifyItemInserted(0);
-        rvLowStockItems.scrollToPosition(0);
+    private String formatCurrency(double amount) {
+        return NumberFormat.getCurrencyInstance(new Locale("en", "PH")).format(amount);
+    }
+
+    public void addNewUpdate(long productId, Update.UpdateType type, int quantity) {
+        Update update = new Update(
+                productId,
+                type,
+                quantity,
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date())
+        );
+
+        long updateId = updateDao.insert(update);
+        if (updateId > 0) {
+            Product product = productDao.get(productId);
+            if (product != null) {
+                update.setProductName(product.getName());
+                updatesList.add(0, update);
+                updateAdapter.notifyItemInserted(0);
+                rvLowStockItems.scrollToPosition(0);
+            }
+        }
     }
 
     @Override
