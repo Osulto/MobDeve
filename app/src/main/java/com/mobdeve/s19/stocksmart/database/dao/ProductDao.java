@@ -12,6 +12,7 @@ import com.mobdeve.s19.stocksmart.utils.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class ProductDao implements BaseDao<Product> {
     private DatabaseHelper dbHelper;
@@ -176,4 +177,23 @@ public class ProductDao implements BaseDao<Product> {
                 cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_UPDATED_AT))
         );
     }
+
+    public Product getByName(String productName) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Product product = null;
+
+        Cursor cursor = db.query(DatabaseHelper.TABLE_PRODUCTS, null,
+                DatabaseHelper.COLUMN_PRODUCT_NAME + " = ? AND " + DatabaseHelper.COLUMN_BUSINESS_ID + " = ?",
+                new String[]{productName, String.valueOf(SessionManager.getInstance(context).getBusinessId())},
+                null, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            product = cursorToProduct(cursor);
+            cursor.close();
+        }
+        db.close();
+        return product;
+    }
+
+
 }

@@ -135,12 +135,47 @@ public class QRScannerActivity extends AppCompatActivity {
     }
 
     private void handleScannedQRCode(String qrContent) {
-        // Parse QR content and start AddStockActivity with the data
-        Intent intent = new Intent(this, AddStockActivity.class);
-        intent.putExtra("qr_data", qrContent);
-        startActivity(intent);
-        finish();
+        String[] pairs = qrContent.split(";");
+        String categoryName = null;
+        String productName = null;
+        String supplierName = null;
+
+        for (String pair : pairs) {
+            String[] keyValue = pair.split(":");
+            if (keyValue.length == 2) {
+                switch (keyValue[0]) {
+                    case "category":
+                        categoryName = keyValue[1];
+                        break;
+                    case "product":
+                        productName = keyValue[1];
+                        break;
+                    case "supplier":
+                        supplierName = keyValue[1];
+                        break;
+                }
+            }
+        }
+
+        if (categoryName != null && productName != null && supplierName != null) {
+            Intent intent = new Intent(this, AddStockActivity.class);
+            intent.putExtra("category_name", categoryName);
+            intent.putExtra("product_name", productName);
+            intent.putExtra("supplier_name", supplierName);
+            intent.putExtra("qr_scan", true); // Indicate this is triggered by a QR scan
+            startActivity(intent);
+            finish();
+        } else {
+            Toast.makeText(this, "Invalid QR Code format", Toast.LENGTH_SHORT).show();
+        }
     }
+
+
+
+
+
+
+
 
     @Override
     protected void onDestroy() {

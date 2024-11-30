@@ -58,10 +58,33 @@ public class AddStockActivity extends AppCompatActivity {
 
         initializeDAOs();
         initializeViews();
-        setupSpinners();
+
+        Intent intent = getIntent();
+        boolean fromQRScan = intent.getBooleanExtra("qr_scan", false);
+        String categoryName = intent.getStringExtra("category_name");
+        String productName = intent.getStringExtra("product_name");
+        String supplierName = intent.getStringExtra("supplier_name");
+
+        if (fromQRScan && categoryName != null && productName != null && supplierName != null) {
+            long categoryId = createCategoryIfNotExists(categoryName);
+            if (categoryId != -1) {
+                long productId = createProductIfNotExists(productName, categoryId);
+                if (productId != -1) {
+                    createSupplierIfNotExists(supplierName);
+                    setupSpinners(categoryName, productName, supplierName);
+                }
+            }
+        } else {
+            setupSpinners();
+        }
+
         setupListeners();
         setupBottomNavigation();
     }
+
+
+
+
 
     private void initializeDAOs() {
         categoryDao = new CategoryDao(this);
@@ -88,9 +111,48 @@ public class AddStockActivity extends AppCompatActivity {
 
     private void setupSpinners() {
         setupCategorySpinner();
-        setupProductSpinner(null);  // Initially no category selected
+        setupProductSpinner(null);
         setupSupplierSpinner();
     }
+
+
+    private void setupSpinners(String categoryName, String productName, String supplierName) {
+        setupCategorySpinner();
+
+        if (categoryName != null) {
+            for (int i = 0; i < categories.size(); i++) {
+                if (categories.get(i).getName().equals(categoryName)) {
+                    categorySpinner.setSelection(i + 1);
+                    setupProductSpinner(categories.get(i).getId());
+                    break;
+                }
+            }
+        } else {
+            setupProductSpinner(null);
+        }
+
+        if (productName != null) {
+            for (int i = 0; i < products.size(); i++) {
+                if (products.get(i).getName().equals(productName)) {
+                    productSpinner.setSelection(i + 1);
+                    break;
+                }
+            }
+        }
+
+        if (supplierName != null) {
+            for (int i = 0; i < suppliers.size(); i++) {
+                if (suppliers.get(i).getName().equals(supplierName)) {
+                    supplierSpinner.setSelection(i + 1);
+                    break;
+                }
+            }
+        }
+    }
+
+
+
+
 
     private void setupCategorySpinner() {
         categories = categoryDao.getAll();
@@ -125,6 +187,7 @@ public class AddStockActivity extends AppCompatActivity {
             }
         });
     }
+
 
     private void setupProductSpinner(Long categoryId) {
         if (categoryId != null) {
@@ -339,4 +402,83 @@ public class AddStockActivity extends AppCompatActivity {
             return false;
         });
     }
+
+    private long createCategoryIfNotExists(String categoryName) {
+        System.out.println("Checking or creating category: " + categoryName);
+
+        Category existingCategory = categoryDao.getByName(categoryName);
+        if (existingCategory == null) {
+            Category newCategory = new Category(categoryName, "default_icon_path");
+            long categoryId = categoryDao.insert(newCategory);
+            if (categoryId > 0) {
+                System.out.println("Category created: " + categoryName + " with ID: " + categoryId);
+                return categoryId;
+            } else {
+                Toast.makeText(this, "Failed to create category", Toast.LENGTH_SHORT).show();
+                return -1;
+            }
+        }
+        System.out.println("Category exists: " + categoryName + " with ID: " + existingCategory.getId());
+        return existingCategory.getId();
+    }
+
+
+
+    private long createProductIfNotExists(String productName, long categoryId) {
+        Product existingProduct = productDao.getByName(productName);
+        if (existingProduct == null) {
+            // Provide default values for missing fields
+            Product newProduct = new Product(
+                    productName,    // name
+                    categoryId,     // categoryId
+                    0,              // quantity (default 0)
+                    10,             // reorderPoint (default 10 or any logical value)
+                    0.0,            // supplierPrice (default 0.0)
+                    0.0,            // sellingPrice (default 0.0)
+                    null,           // supplierId (default null)
+                    null,           // qrCode (default null)
+                    null            // description (default null)
+            );
+
+            long productId = productDao.insert(newProduct);
+            if (productId > 0) {
+                return productId;
+            } else {
+                Toast.makeText(this, "Failed to create product", Toast.LENGTH_SHORT).show();
+                return -1;
+            }
+        }
+        return existingProduct.getId();
+    }
+
+    private long createSupplierIfNotExists(String supplierName) {
+        for (Supplier supplier : suppliers) {
+            if (supplier.getName().equals(supplierName)) {
+                return supplier.getId();
+            }
+        }
+
+        Supplier newSupplier = new Supplier(supplierName, null); // Add name and optional contact
+        long supplierId = supplierDao.insert(newSupplier);
+        if (supplierId > 0) {
+            suppliers.add(newSupplier); // Add to the local list for immediate use
+            return supplierId;
+        } else {
+            Toast.makeText(this, "Failed to create supplier", Toast.LENGTH_SHORT).show();
+            return -1;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
