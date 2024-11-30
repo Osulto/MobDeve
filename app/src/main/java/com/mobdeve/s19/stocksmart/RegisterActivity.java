@@ -3,13 +3,13 @@ package com.mobdeve.s19.stocksmart;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.mobdeve.s19.stocksmart.database.dao.UserDao;
 import com.mobdeve.s19.stocksmart.database.models.User;
 import com.mobdeve.s19.stocksmart.utils.SessionManager;
-import android.widget.Toast;
 
 public class RegisterActivity extends AppCompatActivity {
     private TextInputEditText etBusinessName, etUsername, etPassword, etConfirmPassword;
@@ -17,15 +17,16 @@ public class RegisterActivity extends AppCompatActivity {
     private TextView tvLogin;
     private UserDao userDao;
     private SessionManager sessionManager;
+    private FirebaseAuthManager firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        // Initialize DAO and SessionManager
         userDao = ((StockSmartApp) getApplication()).getUserDao();
         sessionManager = SessionManager.getInstance(this);
+        firebaseAuth = new FirebaseAuthManager(this);
 
         initializeViews();
         setupClickListeners();
@@ -54,7 +55,6 @@ public class RegisterActivity extends AppCompatActivity {
         String password = etPassword.getText().toString();
         String confirmPassword = etConfirmPassword.getText().toString();
 
-        // Basic validation
         if (businessName.isEmpty() || username.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
             return;
@@ -65,38 +65,48 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        // Check if username already exists
         if (userDao.findByUsername(username) != null) {
             Toast.makeText(this, "Username already exists", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Check if business exists and get its first user
-        User existingBusinessUser = userDao.getFirstUserByBusinessName(businessName);
+        btnRegister.setEnabled(false);
 
-        // Create new user
-        User newUser = new User(businessName, username, password);
-        long userId = userDao.insert(newUser);
+        firebaseAuth.registerUser(username, password, businessName, new FirebaseAuthManager.AuthCallback() {
+            @Override
+            public void onSuccess(String firebaseUserId) {
+                User existingBusinessUser = userDao.getFirstUserByBusinessName(businessName);
 
-        if (userId != -1) {
-            newUser.setId(userId);
+                // Create new user locally
+                User newUser = new User(businessName, username, password);
+                long localUserId = userDao.insert(newUser);
+                newUser.setId(localUserId);
 
-            // Set session
-            sessionManager.createLoginSession(newUser);
+                // Create session
+                sessionManager.createLoginSession(firebaseUserId, username);
 
-            // If business already exists, link to its data
-            if (existingBusinessUser != null) {
-                sessionManager.setBusinessId(existingBusinessUser.getId());  // Use first user's ID as business ID
-                Toast.makeText(this, "Joined existing business: " + businessName, Toast.LENGTH_SHORT).show();
+                if (existingBusinessUser != null) {
+                    sessionManager.setBusinessId(existingBusinessUser.getId());
+                    Toast.makeText(RegisterActivity.this, "Joined existing business: " + businessName, Toast.LENGTH_SHORT).show();
+                } else {
+                    sessionManager.setBusinessId(localUserId);
+                    // Initialize sample data for new business
+                    ((StockSmartApp) getApplication()).initializeSampleData();
+                }
+
+                Intent intent = new Intent(RegisterActivity.this, HomeActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
             }
 
-            // Go to Home
-            Intent intent = new Intent(this, HomeActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        } else {
-            Toast.makeText(this, "Registration failed", Toast.LENGTH_SHORT).show();
-        }
+            @Override
+            public void onError(String error) {
+                runOnUiThread(() -> {
+                    Toast.makeText(RegisterActivity.this, error, Toast.LENGTH_SHORT).show();
+                    btnRegister.setEnabled(true);
+                });
+            }
+        });
     }
-}
+    }

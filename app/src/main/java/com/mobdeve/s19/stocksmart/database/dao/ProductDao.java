@@ -27,7 +27,7 @@ public class ProductDao implements BaseDao<Product> {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
 
-        values.put(DatabaseHelper.COLUMN_BUSINESS_ID, SessionManager.getInstance(context).getUserId());
+        values.put(DatabaseHelper.COLUMN_BUSINESS_ID, SessionManager.getInstance(context).getBusinessId());
         values.put(DatabaseHelper.COLUMN_PRODUCT_NAME, product.getName());
         values.put(DatabaseHelper.COLUMN_CATEGORY_ID, product.getCategoryId());
         values.put(DatabaseHelper.COLUMN_QUANTITY, product.getQuantity());
@@ -61,7 +61,7 @@ public class ProductDao implements BaseDao<Product> {
         int rowsAffected = db.update(DatabaseHelper.TABLE_PRODUCTS, values,
                 DatabaseHelper.COLUMN_ID + " = ? AND " + DatabaseHelper.COLUMN_BUSINESS_ID + " = ?",
                 new String[]{String.valueOf(product.getId()),
-                        String.valueOf(SessionManager.getInstance(context).getUserId())});
+                        String.valueOf(SessionManager.getInstance(context).getBusinessId())});
         db.close();
         return rowsAffected > 0;
     }
@@ -72,7 +72,7 @@ public class ProductDao implements BaseDao<Product> {
         int result = db.delete(DatabaseHelper.TABLE_PRODUCTS,
                 DatabaseHelper.COLUMN_ID + " = ? AND " + DatabaseHelper.COLUMN_BUSINESS_ID + " = ?",
                 new String[]{String.valueOf(id),
-                        String.valueOf(SessionManager.getInstance(context).getUserId())});
+                        String.valueOf(SessionManager.getInstance(context).getBusinessId())});
         db.close();
         return result > 0;
     }
@@ -85,7 +85,7 @@ public class ProductDao implements BaseDao<Product> {
         Cursor cursor = db.query(DatabaseHelper.TABLE_PRODUCTS, null,
                 DatabaseHelper.COLUMN_ID + " = ? AND " + DatabaseHelper.COLUMN_BUSINESS_ID + " = ?",
                 new String[]{String.valueOf(id),
-                        String.valueOf(SessionManager.getInstance(context).getUserId())},
+                        String.valueOf(SessionManager.getInstance(context).getBusinessId())},
                 null, null, null);
 
         if (cursor != null && cursor.moveToFirst()) {
@@ -103,7 +103,7 @@ public class ProductDao implements BaseDao<Product> {
 
         Cursor cursor = db.query(DatabaseHelper.TABLE_PRODUCTS, null,
                 DatabaseHelper.COLUMN_BUSINESS_ID + " = ?",
-                new String[]{String.valueOf(SessionManager.getInstance(context).getUserId())},
+                new String[]{String.valueOf(SessionManager.getInstance(context).getBusinessId())},
                 null, null, null);
 
         if (cursor != null) {
@@ -123,7 +123,7 @@ public class ProductDao implements BaseDao<Product> {
         Cursor cursor = db.query(DatabaseHelper.TABLE_PRODUCTS, null,
                 DatabaseHelper.COLUMN_CATEGORY_ID + " = ? AND " + DatabaseHelper.COLUMN_BUSINESS_ID + " = ?",
                 new String[]{String.valueOf(categoryId),
-                        String.valueOf(SessionManager.getInstance(context).getUserId())},
+                        String.valueOf(SessionManager.getInstance(context).getBusinessId())},
                 null, null, null);
 
         if (cursor != null) {
@@ -146,7 +146,7 @@ public class ProductDao implements BaseDao<Product> {
                 " AND " + DatabaseHelper.COLUMN_BUSINESS_ID + " = ?";
 
         Cursor cursor = db.rawQuery(query,
-                new String[]{String.valueOf(SessionManager.getInstance(context).getUserId())});
+                new String[]{String.valueOf(SessionManager.getInstance(context).getBusinessId())});
 
         if (cursor != null) {
             while (cursor.moveToNext()) {

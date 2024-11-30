@@ -5,6 +5,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import androidx.core.content.ContextCompat;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.appcheck.FirebaseAppCheck;
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory;
 import com.mobdeve.s19.stocksmart.database.DatabaseHelper;
 import com.mobdeve.s19.stocksmart.database.dao.CategoryDao;
 import com.mobdeve.s19.stocksmart.database.dao.ProductDao;
@@ -12,6 +15,8 @@ import com.mobdeve.s19.stocksmart.database.dao.UserDao;
 import com.mobdeve.s19.stocksmart.database.dao.StockMovementDao;
 import com.mobdeve.s19.stocksmart.database.models.Category;
 import com.mobdeve.s19.stocksmart.database.models.Product;
+import com.mobdeve.s19.stocksmart.database.models.StockMovement;
+import com.mobdeve.s19.stocksmart.utils.SessionManager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
@@ -28,6 +33,17 @@ public class StockSmartApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        // Initialize Firebase
+        FirebaseApp.initializeApp(this);
+
+        // Initialize App Check
+        FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.getInstance();
+        firebaseAppCheck.installAppCheckProviderFactory(
+                PlayIntegrityAppCheckProviderFactory.getInstance()
+        );
+
+
 
         // Initialize database helper
         dbHelper = new DatabaseHelper(this);
@@ -46,7 +62,9 @@ public class StockSmartApp extends Application {
 
     public void initializeSampleData() {
         try {
-            // Only add sample data if there are no categories
+            SessionManager sessionManager = SessionManager.getInstance(this);
+            long businessId = sessionManager.getBusinessId();
+
             if (categoryDao.getAll().isEmpty()) {
                 // Create sample category with placeholder image
                 String iconPath = saveVectorDrawableAsBitmap(R.drawable.placeholder_image);
@@ -69,7 +87,22 @@ public class StockSmartApp extends Application {
                         sampleProduct.setCreatedAt(timestamp);
                         sampleProduct.setUpdatedAt(timestamp);
 
-                        productDao.insert(sampleProduct);
+                        long productId = productDao.insert(sampleProduct);
+
+                        // Create initial stock movement for the sample product
+// Create initial stock movement for the sample product
+                        StockMovement initialStock = new StockMovement(
+                                productId,      // productId
+                                "IN",          // movementType
+                                10,            // quantity
+                                1L,            // supplierId
+                                100.0          // supplierPrice
+                        );
+
+                        // Set the business ID before inserting
+                        initialStock.setBusinessId(businessId);
+                        initialStock.setCreatedAt(timestamp);
+                        stockMovementDao.insert(initialStock);
                     }
                 }
             }

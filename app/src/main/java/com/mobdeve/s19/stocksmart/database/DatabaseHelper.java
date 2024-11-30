@@ -96,7 +96,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_SUPPLIER_PRICE + " REAL, " +
                     COLUMN_SELLING_PRICE + " REAL, " +
                     COLUMN_SUPPLIER_ID + " INTEGER, " +
-                    COLUMN_QR_CODE + " TEXT UNIQUE, " +
+                    COLUMN_QR_CODE + " TEXT, " +
                     COLUMN_DESCRIPTION + " TEXT, " +
                     COLUMN_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP, " +
                     COLUMN_UPDATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP, " +
@@ -126,8 +126,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_PRODUCT_ID + " INTEGER NOT NULL, " +
                     COLUMN_MOVEMENT_TYPE + " TEXT NOT NULL, " +
                     COLUMN_MOVEMENT_QUANTITY + " INTEGER NOT NULL, " +
-                    COLUMN_SUPPLIER_ID + " INTEGER NOT NULL, " +  // Changed
-                    COLUMN_SUPPLIER_PRICE + " REAL NOT NULL, " +  // Added
+                    COLUMN_SUPPLIER_ID + " INTEGER NOT NULL, " +
+                    COLUMN_SUPPLIER_PRICE + " REAL NOT NULL, " +
                     COLUMN_CREATED_AT + " DATETIME DEFAULT CURRENT_TIMESTAMP, " +
                     "FOREIGN KEY(" + COLUMN_BUSINESS_ID + ") REFERENCES " +
                     TABLE_USERS + "(" + COLUMN_ID + ")," +

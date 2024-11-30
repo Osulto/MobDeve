@@ -118,7 +118,7 @@ public class UserDao implements BaseDao<User> {
                 DatabaseHelper.COLUMN_BUSINESS_NAME + " = ?",
                 new String[]{businessName},
                 null, null,
-                DatabaseHelper.COLUMN_CREATED_AT + " ASC LIMIT 1");  // Get the first user of this business
+                DatabaseHelper.COLUMN_CREATED_AT + " ASC LIMIT 1");
 
         if (cursor != null && cursor.moveToFirst()) {
             user = cursorToUser(cursor);
@@ -136,6 +136,30 @@ public class UserDao implements BaseDao<User> {
                 DatabaseHelper.COLUMN_BUSINESS_NAME + " = ?",
                 new String[]{businessName},
                 null, null, null);
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                users.add(cursorToUser(cursor));
+            }
+            cursor.close();
+        }
+        db.close();
+        return users;
+    }
+
+    public List<User> getAllUsersForBusiness(String businessName) {
+        List<User> users = new ArrayList<>();
+        db = dbHelper.getReadableDatabase();
+
+        Cursor cursor = db.query(
+                DatabaseHelper.TABLE_USERS,
+                null,
+                DatabaseHelper.COLUMN_BUSINESS_NAME + " = ?",
+                new String[]{businessName},
+                null,
+                null,
+                DatabaseHelper.COLUMN_CREATED_AT + " ASC"
+        );
 
         if (cursor != null) {
             while (cursor.moveToNext()) {

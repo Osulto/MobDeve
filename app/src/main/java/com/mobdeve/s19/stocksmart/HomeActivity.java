@@ -11,15 +11,26 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.mobdeve.s19.stocksmart.database.dao.ProductDao;
 import com.mobdeve.s19.stocksmart.database.dao.StockMovementDao;
 import com.mobdeve.s19.stocksmart.database.dao.UpdateDao;
+import com.mobdeve.s19.stocksmart.database.dao.CategoryDao;
 import com.mobdeve.s19.stocksmart.database.models.Product;
 import com.mobdeve.s19.stocksmart.database.models.StockMovement;
 import com.mobdeve.s19.stocksmart.database.models.Update;
+import com.mobdeve.s19.stocksmart.database.models.Category;
 import com.mobdeve.s19.stocksmart.utils.SessionManager;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import android.graphics.Color;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 public class HomeActivity extends AppCompatActivity {
@@ -33,6 +44,10 @@ public class HomeActivity extends AppCompatActivity {
     private ProductDao productDao;
     private StockMovementDao stockMovementDao;
     private UpdateDao updateDao;
+    private PieChart stockDistributionChart;
+    private CategoryDao categoryDao;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +69,15 @@ public class HomeActivity extends AppCompatActivity {
         productDao = new ProductDao(this);
         stockMovementDao = new StockMovementDao(this);
         updateDao = new UpdateDao(this);
+        categoryDao = new CategoryDao(this);
 
         initializeViews();
         setupClickListeners();
         setupBottomNavigation();
         setupUpdatesRecyclerView();
         updateDashboardData();
+        setupStockDistributionChart();
+
     }
 
     private void initializeViews() {
@@ -84,6 +102,67 @@ public class HomeActivity extends AppCompatActivity {
             Intent intent = new Intent(this, AddStockActivity.class);
             startActivity(intent);
         });
+    }
+
+    private void setupStockDistributionChart() {
+        stockDistributionChart = findViewById(R.id.stockDistributionChart);
+
+        // Configure chart
+        stockDistributionChart.setDrawHoleEnabled(true);
+        stockDistributionChart.setHoleColor(Color.WHITE);
+        stockDistributionChart.setTransparentCircleRadius(61f);
+        stockDistributionChart.setDescription(null);  // Remove description label
+
+        // Add legend
+        Legend legend = stockDistributionChart.getLegend();
+        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
+        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        legend.setDrawInside(false);
+
+        updateStockDistributionData();
+    }
+
+    private void updateStockDistributionData() {
+        List<Product> products = productDao.getAll();
+
+        // Group products by category and sum quantities
+        Map<String, Integer> categoryQuantities = new HashMap<>();
+        for (Product product : products) {
+            // Get category name from categoryId
+            Category category = categoryDao.get(product.getCategoryId());
+            String categoryName = category != null ? category.getName() : "Uncategorized";
+
+            categoryQuantities.merge(categoryName, product.getQuantity(), Integer::sum);
+        }
+
+        // Rest of the code remains the same
+        ArrayList<PieEntry> entries = new ArrayList<>();
+        ArrayList<Integer> colors = new ArrayList<>();
+
+        int[] COLORS = new int[]{
+                Color.rgb(0, 136, 254),  // blue
+                Color.rgb(0, 196, 159),   // green
+                Color.rgb(255, 187, 40),  // yellow
+                Color.rgb(255, 128, 66)   // orange
+        };
+
+        int colorIndex = 0;
+        for (Map.Entry<String, Integer> entry : categoryQuantities.entrySet()) {
+            entries.add(new PieEntry(entry.getValue(), entry.getKey()));
+            colors.add(COLORS[colorIndex % COLORS.length]);
+            colorIndex++;
+        }
+
+        PieDataSet dataSet = new PieDataSet(entries, "Stock Distribution");
+        dataSet.setColors(colors);
+        dataSet.setValueTextSize(12f);
+        dataSet.setValueTextColor(Color.WHITE);
+        dataSet.setValueFormatter(new PercentFormatter(stockDistributionChart));
+
+        PieData data = new PieData(dataSet);
+        stockDistributionChart.setData(data);
+        stockDistributionChart.invalidate();
     }
 
     private void setupBottomNavigation() {
@@ -286,5 +365,8 @@ public class HomeActivity extends AppCompatActivity {
         super.onResume();
         updateDashboardData();
         loadRecentUpdates();
+        updateStockDistributionData();
+
+
     }
 }

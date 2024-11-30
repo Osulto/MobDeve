@@ -368,7 +368,7 @@ public class AddProductActivity extends AppCompatActivity {
                     supplierPrice,            // supplierPrice
                     sellingPrice,             // sellingPrice
                     supplierId,               // supplierId
-                    "",                       // qrCode
+                    null,                       // qrCode
                     ""                        // description
             );
 

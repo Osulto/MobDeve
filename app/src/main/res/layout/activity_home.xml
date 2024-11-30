@@ -253,11 +253,13 @@
                         android:textSize="18sp"
                         android:textStyle="bold"/>
 
-                    <FrameLayout
-                        android:id="@+id/chartContainer"
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/stockDistributionChart"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:layout_marginTop="16dp"/>
+                        android:layout_height="300dp"
+                        android:layout_margin="16dp"/>
+
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

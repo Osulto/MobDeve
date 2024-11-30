@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import com.mobdeve.s19.stocksmart.database.DatabaseHelper;
 import com.mobdeve.s19.stocksmart.database.models.StockMovement;
 import com.mobdeve.s19.stocksmart.utils.SessionManager;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +29,7 @@ public class StockMovementDao implements BaseDao<StockMovement> {
         values.put(DatabaseHelper.COLUMN_BUSINESS_ID, SessionManager.getInstance(context).getBusinessId());
         values.put(DatabaseHelper.COLUMN_PRODUCT_ID, movement.getProductId());
         values.put(DatabaseHelper.COLUMN_MOVEMENT_TYPE, movement.getMovementType());
-        values.put(DatabaseHelper.COLUMN_MOVEMENT_QUANTITY, movement.getQuantity());
+        values.put(DatabaseHelper.COLUMN_QUANTITY, movement.getQuantity());
         values.put(DatabaseHelper.COLUMN_SUPPLIER_ID, movement.getSupplierId());
         values.put(DatabaseHelper.COLUMN_SUPPLIER_PRICE, movement.getSupplierPrice());
 
@@ -38,7 +40,6 @@ public class StockMovementDao implements BaseDao<StockMovement> {
 
     @Override
     public boolean update(StockMovement movement) {
-        // Stock movements typically shouldn't be updated after creation
         return false;
     }
 
@@ -119,24 +120,19 @@ public class StockMovementDao implements BaseDao<StockMovement> {
 
     public double calculateTotalStockValue() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        double totalValue = 0;
-
-        // This query calculates stock value based on the most recent supplier prices
-        String query = "SELECT p.id, p.quantity, " +
-                "(SELECT sm.supplier_price FROM " + DatabaseHelper.TABLE_STOCK_MOVEMENTS + " sm " +
-                "WHERE sm.product_id = p.id AND sm.business_id = p.business_id " +
-                "ORDER BY sm.created_at DESC LIMIT 1) as latest_price " +
+        String query = "SELECT p.id AS product_id, p.supplier_price, p.quantity " +
                 "FROM " + DatabaseHelper.TABLE_PRODUCTS + " p " +
-                "WHERE p.business_id = ?";
+                "WHERE p.business_id = ? AND p.quantity > 0";
 
         Cursor cursor = db.rawQuery(query,
                 new String[]{String.valueOf(SessionManager.getInstance(context).getBusinessId())});
 
+        double totalValue = 0;
         if (cursor != null) {
             while (cursor.moveToNext()) {
+                double supplierPrice = cursor.getDouble(cursor.getColumnIndexOrThrow("supplier_price"));
                 int quantity = cursor.getInt(cursor.getColumnIndexOrThrow("quantity"));
-                double price = cursor.getDouble(cursor.getColumnIndexOrThrow("latest_price"));
-                totalValue += quantity * price;
+                totalValue += (supplierPrice * quantity);
             }
             cursor.close();
         }
@@ -150,10 +146,10 @@ public class StockMovementDao implements BaseDao<StockMovement> {
                 cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_BUSINESS_ID)),
                 cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PRODUCT_ID)),
                 cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_MOVEMENT_TYPE)),
-                cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_MOVEMENT_QUANTITY)),
+                cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_QUANTITY)),
                 cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_SUPPLIER_ID)),
                 cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_SUPPLIER_PRICE)),
-                null, // Notes removed
+                null,
                 cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_CREATED_AT))
         );
     }

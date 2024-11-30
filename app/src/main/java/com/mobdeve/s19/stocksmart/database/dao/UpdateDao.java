@@ -38,7 +38,6 @@ public class UpdateDao implements BaseDao<Update> {
 
     @Override
     public boolean update(Update update) {
-        // Updates are typically not modified after creation
         return false;
     }
 

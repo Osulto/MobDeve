@@ -2,6 +2,7 @@ package com.mobdeve.s19.stocksmart.database.models;
 
 public class Category {
     private long id;
+    private long businessId;
     private String name;
     private String iconPath;
     private String createdAt;
@@ -28,6 +29,14 @@ public class Category {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getBusinessId() {
+        return businessId;
+    }
+
+    public void setBusinessId(long businessId) {
+        this.businessId = businessId;
     }
 
     public String getName() {

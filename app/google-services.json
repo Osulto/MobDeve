@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "120724623054",
+    "project_id": "stocksmart-391c0",
+    "storage_bucket": "stocksmart-391c0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:120724623054:android:5f52714aaf1c9a2187ca9f",
+        "android_client_info": {
+          "package_name": "com.mobdeve.s19.stocksmart"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQXhrmHuojkbH2Kj3w5tmZN-tOixVxXpg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

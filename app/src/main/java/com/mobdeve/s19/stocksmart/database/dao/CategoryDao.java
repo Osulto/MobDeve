@@ -25,7 +25,7 @@ public class CategoryDao implements BaseDao<Category> {
         db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.COLUMN_BUSINESS_ID,
-                SessionManager.getInstance(context).getBusinessId());  // Use business ID instead of user ID
+                SessionManager.getInstance(context).getBusinessId());
         values.put(DatabaseHelper.COLUMN_CATEGORY_NAME, category.getName());
         values.put(DatabaseHelper.COLUMN_CATEGORY_ICON, category.getIconPath());
 
@@ -48,7 +48,7 @@ public class CategoryDao implements BaseDao<Category> {
                 DatabaseHelper.COLUMN_ID + " = ? AND " +
                         DatabaseHelper.COLUMN_BUSINESS_ID + " = ?",
                 new String[]{String.valueOf(category.getId()),
-                        String.valueOf(SessionManager.getInstance(context).getUserId())});
+                        String.valueOf(SessionManager.getInstance(context).getBusinessId())});
         db.close();
         return rowsAffected > 0;
     }
@@ -65,14 +65,14 @@ public class CategoryDao implements BaseDao<Category> {
                     DatabaseHelper.COLUMN_CATEGORY_ID + " = ? AND " +
                             DatabaseHelper.COLUMN_BUSINESS_ID + " = ?",
                     new String[]{String.valueOf(id),
-                            String.valueOf(SessionManager.getInstance(context).getUserId())});
+                            String.valueOf(SessionManager.getInstance(context).getBusinessId())});
 
             // Delete the category
             int rowsAffected = db.delete(DatabaseHelper.TABLE_CATEGORIES,
                     DatabaseHelper.COLUMN_ID + " = ? AND " +
                             DatabaseHelper.COLUMN_BUSINESS_ID + " = ?",
                     new String[]{String.valueOf(id),
-                            String.valueOf(SessionManager.getInstance(context).getUserId())});
+                            String.valueOf(SessionManager.getInstance(context).getBusinessId())});
 
             if (rowsAffected > 0) {
                 db.setTransactionSuccessful();
@@ -98,7 +98,7 @@ public class CategoryDao implements BaseDao<Category> {
                 DatabaseHelper.COLUMN_ID + " = ? AND " +
                         DatabaseHelper.COLUMN_BUSINESS_ID + " = ?",
                 new String[]{String.valueOf(id),
-                        String.valueOf(SessionManager.getInstance(context).getUserId())},
+                        String.valueOf(SessionManager.getInstance(context).getBusinessId())},
                 null, null, null);
 
         if (cursor != null && cursor.moveToFirst()) {
@@ -117,7 +117,7 @@ public class CategoryDao implements BaseDao<Category> {
         Cursor cursor = db.query(DatabaseHelper.TABLE_CATEGORIES,
                 null,
                 DatabaseHelper.COLUMN_BUSINESS_ID + " = ?",
-                new String[]{String.valueOf(SessionManager.getInstance(context).getUserId())},
+                new String[]{String.valueOf(SessionManager.getInstance(context).getBusinessId())},
                 null, null,
                 DatabaseHelper.COLUMN_CREATED_AT + " ASC");
 
@@ -138,7 +138,7 @@ public class CategoryDao implements BaseDao<Category> {
         Cursor cursor = db.query(DatabaseHelper.TABLE_CATEGORIES, null,
                 DatabaseHelper.COLUMN_CATEGORY_NAME + " = ? AND " +
                         DatabaseHelper.COLUMN_BUSINESS_ID + " = ?",
-                new String[]{name, String.valueOf(SessionManager.getInstance(context).getUserId())},
+                new String[]{name, String.valueOf(SessionManager.getInstance(context).getBusinessId())},
                 null, null, null);
 
         if (cursor != null && cursor.moveToFirst()) {
